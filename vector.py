@@ -81,6 +81,8 @@ class Vector:
         return Vector(self.x, self.y) 
     def vec2tuple(self):
         return (self.x, self.y)
+    def normal(self):
+        return Vector(-1 * self.y, self.x)
        
 
 

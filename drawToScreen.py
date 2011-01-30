@@ -31,7 +31,7 @@ class UpdateThread(threading.Thread):
 pygame.init()
 
 #are we rendering to a file?
-RENDERTOFILE = 1
+RENDERTOFILE = 0
 FILENAME = 'Outbreak\\'
 
 # set up the window
@@ -55,7 +55,7 @@ tMAX = 1800
 t1 = time.time()
 
 
-for i in range(150):
+for i in range(30):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -69,7 +69,7 @@ for i in range(150):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(15):
+for i in range(5):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
@@ -82,6 +82,11 @@ for i in range(15):
     agents.append(tempAgent)
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GREEN}
     agentDots.append(tempBall)
+
+l = Vector(300,300)
+r = Vector(500,500)
+wall = WallAgent(l, r, (r - l).normal())
+agents.append(wall)
 
 # run the game loop
 t = 0
@@ -96,6 +101,8 @@ while t < tMAX:
     # draw the black background onto the surface
     windowSurface.fill(BLACK)
 
+    pygame.draw.line(windowSurface, (240, 240, 240), wall.left_point.vec2tuple(), wall.right_point.vec2tuple(), 5)
+
     threads = [ UpdateThread(x, agents, Box(0.0)) for x in agents ]
     boxes = [ t.box for t in threads ]
     [ t.start() for t in threads ]
@@ -104,7 +111,7 @@ while t < tMAX:
     for i in range(len(agents)):
         agents[i].update(boxes[i].peek())
         
-    agentLimit = len(agents)
+    agentLimit = len(agentDots)
     i = 0
     while i < agentLimit:    
         if(agents[i].position.x < 0):

@@ -1,4 +1,5 @@
 from vector import *
+from math import sqrt, pi
 
 class Agent:
     def __init__(self, mass, position, orientation, speed, sight_range, sight_angle, max_speed):
@@ -36,14 +37,14 @@ class Agent:
             res += self.getForce(o)
         return res
     def update(self, force):
-        '''Updates the position, orientation, and speed of this agent based on a force'''
+        '''Updates the position, orientation, and speed of this agent based on a force'''        
         if(self.isHuman() and self.incubating):
             self.health -= .1
-            
-        a = force / self.mass
-        v = (a + self.velocity()).truncate(self.max_speed)
-        self.speed = v.magnitude()
-        self.orientation = v / self.speed
+        if force.magnitude() != 0.0:    
+            a = force / self.mass
+            v = (a + self.velocity()).truncate(self.max_speed)
+            self.speed = v.magnitude()
+            self.orientation = v / self.speed
         self.position += self.velocity()
         
 
@@ -89,7 +90,14 @@ class HumanAgent(Agent):
                 if not self.isFacing(other):
                     f *= 0.5 # halve influence TODO extract constant
             if other.isWall():
-                pass
+                g = Vector(0,0)
+                if other.insideBounds(self):
+                    dst = other.perpDist(self)
+                    if other.onNormalSide(self):
+                        g += other.normal * (1 / dst)
+                    else:
+                        g += other.normal * (-1 / dst)
+                f += g
         return f
 
 class ZombieAgent(Agent):
@@ -129,18 +137,36 @@ class ZombieAgent(Agent):
                 if not self.isFacing(other):
                     f *= 0.5 # halve influence TODO extract constant
             if other.isWall():
-                pass #wall code here
+                if other.isWall():
+                    g = Vector(0,0)
+                if other.insideBounds(self):
+                    dst = other.perpDist(self)
+                    if other.onNormalSide(self):
+                        g += other.normal * (1 / dst)
+                    else:
+                        g += other.normal * (-1 / dst)
+                f += g
         return f
 
 class WallAgent(Agent):
-    def __init__(self, left_point, right_point):
-        Agent.__init__(self, 1, left_point, right_point - left_point, 0, 0.0, 0.0, 0)
+    def __init__(self, left_point, right_point, normal):
+        Agent.__init__(self, 1, left_point, normal / normal.magnitude(), 0, 0.0, 0.0, 0)
         self.left_point = left_point
         self.right_point = right_point
-        temp = left_point - right_point
-        self.normal = Vector(-temp.y, temp.x)/ temp.magnitude();
+        self.normal = normal / normal.magnitude()
     def isWall(self):
         return True
+    def onNormalSide(self, other):
+        return abs(self.normal.angleBetween(other.position)) < pi
+    def insideBounds(self, other):
+        inx = self.left_point.x < other.position.x < self.right_point.x or self.left_point.x > other.position.x > self.right_point.x
+        iny = self.left_point.y < other.position.y < self.right_point.y or self.left_point.y > other.position.y > self.right_point.y
+        return inx or iny
+    def perpDist(self, other):
+        area = abs((1 / 2) * (self.left_point.x * self.right_point.y + self.right_point.x * other.position.y + other.position.x * self.left_point.y \
+                              - self.right_point.x * self.left_point.y - other.position.x * self.right_point.y - self.left_point.x * other.position.y))
+        base = (self.left_point - self.right_point).magnitude()
+        return area * 2 / base
 
 class GunCacheAgent(Agent):
     def __init__(self, position):
