@@ -31,7 +31,7 @@ class UpdateThread(threading.Thread):
 pygame.init()
 
 #are we rendering to a file?
-RENDERTOFILE = 0
+RENDERTOFILE = 1
 FILENAME = 'Outbreak\\'
 
 # set up the window
@@ -53,9 +53,10 @@ agents = []
 agentDots = []
 tMAX = 1800
 t1 = time.time()
+wallList = []
 
 
-for i in range(30):
+for i in range(150):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -83,10 +84,12 @@ for i in range(5):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GREEN}
     agentDots.append(tempBall)
 
-l = Vector(300,300)
-r = Vector(500,500)
-wall = WallAgent(l, r, (r - l).normal())
-agents.append(wall)
+
+for w in range(30):    
+    l = Vector(random()*750+25,random()*750+25)
+    r = Vector(l.x+random()*40-20,l.y+random()*40-20)
+    wall = WallAgent(l, r, (r - l).normal())
+    agents.append(wall)
 
 # run the game loop
 t = 0
@@ -101,7 +104,8 @@ while t < tMAX:
     # draw the black background onto the surface
     windowSurface.fill(BLACK)
 
-    pygame.draw.line(windowSurface, (240, 240, 240), wall.left_point.vec2tuple(), wall.right_point.vec2tuple(), 5)
+    
+        
 
     threads = [ UpdateThread(x, agents, Box(0.0)) for x in agents ]
     boxes = [ t.box for t in threads ]
@@ -110,6 +114,12 @@ while t < tMAX:
 
     for i in range(len(agents)):
         agents[i].update(boxes[i].peek())
+        if(agents[i].isHuman() and agents[i].incubating):
+            b = agentDots[i]
+            b['color'] = (15, round((100-agents[i].health)/100 * 155), 15)
+        if(agents[i].isWall()):
+            pygame.draw.line(windowSurface, (220, 220, 220), agents[i].left_point.vec2tuple(), agents[i].right_point.vec2tuple(), 2)
+            
         
     agentLimit = len(agentDots)
     i = 0
@@ -138,7 +148,6 @@ while t < tMAX:
             agentLimit -= 1
         else:
             pygame.draw.line(windowSurface, GRAY, (b['x'], b['y']),(b['x']+agents[i].orientation.x*6,b['y']+agents[i].orientation.y*6))
-        #pygame.draw.line(windowSurface, GRAY, (b['x'], b['y']),(b['x']+10*cos(angle),b['y']-10*sin(angle)))
             pygame.draw.circle(windowSurface, b['color'], (round(b['x']), round(b['y'])), b['rad'])
         i += 1
     # draw the window onto the screen

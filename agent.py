@@ -15,7 +15,10 @@ class Agent:
         return self.orientation * self.speed
     def inRangeOf(self, other):
         '''Returns True if the other agent is in range of this agent'''
-        return (self.position - other.position).magnitude() <= self.sight_range
+        if(other.isWall()):
+            return other.perpDist(self) <= self.sight_range
+        else:
+            return (self.position - other.position).magnitude() <= self.sight_range
     def isFacing(self, other):
         '''Returns True if the other agent is inside the angle of sight of this agent'''
         return abs(self.orientation.angleBetween(other.position)) <= self.sight_angle
@@ -94,9 +97,9 @@ class HumanAgent(Agent):
                 if other.insideBounds(self):
                     dst = other.perpDist(self)
                     if other.onNormalSide(self):
-                        g += other.normal * (1 / dst)
+                        g += other.normal * (15 / dst / dst) 
                     else:
-                        g += other.normal * (-1 / dst)
+                        g += other.normal * (-15 / dst / dst)
                 f += g
         return f
 
@@ -137,14 +140,13 @@ class ZombieAgent(Agent):
                 if not self.isFacing(other):
                     f *= 0.5 # halve influence TODO extract constant
             if other.isWall():
-                if other.isWall():
-                    g = Vector(0,0)
+                g = Vector(0,0)
                 if other.insideBounds(self):
                     dst = other.perpDist(self)
                     if other.onNormalSide(self):
-                        g += other.normal * (1 / dst)
+                        g += other.normal * (15 / dst / dst)  
                     else:
-                        g += other.normal * (-1 / dst)
+                        g += other.normal * (-15 / dst / dst) 
                 f += g
         return f
 
@@ -156,8 +158,8 @@ class WallAgent(Agent):
         self.normal = normal / normal.magnitude()
     def isWall(self):
         return True
-    def onNormalSide(self, other):
-        return abs(self.normal.angleBetween(other.position)) < pi
+    def onNormalSide(self, other):    
+        return abs(self.normal.angleBetween(other.position)) < pi/2
     def insideBounds(self, other):
         inx = self.left_point.x < other.position.x < self.right_point.x or self.left_point.x > other.position.x > self.right_point.x
         iny = self.left_point.y < other.position.y < self.right_point.y or self.left_point.y > other.position.y > self.right_point.y
