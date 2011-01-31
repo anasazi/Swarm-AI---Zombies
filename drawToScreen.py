@@ -53,7 +53,6 @@ agents = []
 agentDots = []
 tMAX = 1800
 t1 = time.time()
-wallList = []
 
 
 for i in range(150):
@@ -70,7 +69,7 @@ for i in range(150):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(5):
+for i in range(15):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
