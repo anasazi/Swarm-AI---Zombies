@@ -96,10 +96,10 @@ class HumanAgent(Agent):
                 g = Vector(0,0)
                 if other.insideBounds(self):
                     dst = other.perpDist(self)
-                    if other.onNormalSide(self):
-                        g += other.normal * (15 / dst / dst) 
-                    else:
-                        g += other.normal * (-15 / dst / dst)
+                    temp = other.closestPoint(self, 1)
+                    temp = temp - self.position
+                    temp = temp/temp.magnitude()
+                    g += temp * (-30 / dst / dst) 
                 f += g
         return f
 
@@ -143,10 +143,10 @@ class ZombieAgent(Agent):
                 g = Vector(0,0)
                 if other.insideBounds(self):
                     dst = other.perpDist(self)
-                    if other.onNormalSide(self):
-                        g += other.normal * (15 / dst / dst)  
-                    else:
-                        g += other.normal * (-15 / dst / dst) 
+                    temp = other.closestPoint(self, 1)
+                    temp = temp - self.position
+                    temp = temp/temp.magnitude()
+                    g += temp * (-30 / dst / dst)
                 f += g
         return f
 
@@ -158,8 +158,13 @@ class WallAgent(Agent):
         self.normal = normal / normal.magnitude()
     def isWall(self):
         return True
-    def onNormalSide(self, other):    
-        return abs(self.normal.angleBetween(other.position)) < pi/2
+    def onNormalSide(self, other): 
+        temp = self.closestPoint(other, 1)
+        temp = temp/temp.magnitude()
+        temp = temp - other.position
+        print(self.normal.angleBetweenAtan(temp)* 180 / pi)
+        print(self.normal)
+        return abs(self.normal.angleBetween(temp)) < pi
     def insideBounds(self, other):
         inx = self.left_point.x < other.position.x < self.right_point.x or self.left_point.x > other.position.x > self.right_point.x
         iny = self.left_point.y < other.position.y < self.right_point.y or self.left_point.y > other.position.y > self.right_point.y
@@ -169,6 +174,31 @@ class WallAgent(Agent):
                               - self.right_point.x * self.left_point.y - other.position.x * self.right_point.y - self.left_point.x * other.position.y))
         base = (self.left_point - self.right_point).magnitude()
         return area * 2 / base
+    def closestPoint(self, other, segmentRestriction):
+        dP = other.position - self.left_point
+        dB = self.right_point - self.left_point
+        t = dP.dotProduct(dB) / dB.dotProduct(dB)
+        if(segmentRestriction):
+            if(t < 0):
+                t = 0;
+            elif (t > 1):
+                t = 1;
+        return self.left_point + dB * t
+                
+        
+#Vector GetClosetPoint(Vector A, Vector B, Vector P, bool segmentClamp){
+#Vector AP = P - A:
+#Vector AB = B - A;
+#float ab2 = AB.x*AB.x + AB.y*AB.y;
+#float ap_ab = AP.x*AB.x + AP.y*AB.y;
+#float t = ap_ab / ab2;
+#if (segmentClamp)
+#{
+# if (t < 0.0f) t = 0.0f;
+# else if (t > 1.0f) t = 1.0f;
+#}
+#Vector Closest = A + AB * t;
+#return Closest;
 
 class GunCacheAgent(Agent):
     def __init__(self, position):

@@ -51,11 +51,11 @@ GRAY = (100, 100, 100)
 # set up the block data structure
 agents = []
 agentDots = []
-tMAX = 1800
+tMAX = 2000
 t1 = time.time()
 
 
-for i in range(150):
+for i in range(170):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -69,7 +69,7 @@ for i in range(150):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(15):
+for i in range(25):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
@@ -84,10 +84,12 @@ for i in range(15):
     agentDots.append(tempBall)
 
 
-for w in range(30):    
+for w in range(50):    
     l = Vector(random()*750+25,random()*750+25)
-    r = Vector(l.x+random()*40-20,l.y+random()*40-20)
-    wall = WallAgent(l, r, (r - l).normal())
+    r = Vector(l.x-random()*40,l.y-random()*40)
+    n = (r - l).normal()
+    n = n / n.magnitude()
+    wall = WallAgent(l, r, n)
     agents.append(wall)
 
 # run the game loop

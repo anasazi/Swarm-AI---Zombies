@@ -2,7 +2,7 @@
 #Robert Pienta
 #Eric Reed
 
-from math import acos, sqrt, pi
+from math import acos, sqrt, pi, atan2
 
 class Vector:
     """A simple 2d vector
@@ -71,7 +71,12 @@ class Vector:
     def dotProduct(self, v1):
         return self.x*v1.x + self.y*v1.y
     def angleBetween(self, v1):
-        return acos(self.dotProduct(v1)/(self.magnitude()*v1.magnitude()))
+        t = self.magnitude()*v1.magnitude()
+        if(not t == 0):
+            return acos(self.dotProduct(v1)/(self.magnitude()*v1.magnitude()))
+        return 0
+    def angleBetweenAtan(self, v1):
+        return atan2(self.y, self.x) - atan2(v1.y, v1.x)
     def projection(self, v1):
         return v1.scalarMult(self.dotProduct(v1)/v1.magnitudeSansRoot())
     def truncate(self, scalar):
