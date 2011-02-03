@@ -111,6 +111,9 @@ class HumanAgent(Agent):
                     else:
                         g = (other.position - self.position) / dist
                     g *= self.personal_space / dist #increases the closer they are to the cache
+                f+=g
+                if not self.isFacing(other):
+                    f *= 0.5 # halve influence TODO extract constant
 
 
         return f
