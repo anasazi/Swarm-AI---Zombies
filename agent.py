@@ -1,5 +1,6 @@
 from vector import *
-from math import sqrt, pi
+from math import sqrt, pi, exp
+from random import random
 
 class Agent:
     def __init__(self, mass, position, orientation, speed, sight_range, sight_angle, max_speed):
@@ -84,14 +85,20 @@ class HumanAgent(Agent):
                     f *= 0.5 # halve influence TODO extract constant      
             if other.isZombie():
                 dist = (self.position - other.position).magnitude()
+                if (dist <= self.sight_range and self.isFacing(other) and self.has_gun):
+                    accuracy = 6 + dist / (self.sight_range / 4) #adjusts bounds of damage sig function based on distance from target
+                    rand = random()*16 - accuracy
+                    gunDamage = (1 / (1 + exp(rand))) * 100
+                    other.health -= gunDamage
                 if(dist <= self.attack_range and self.isFacing(other)):
                     other.health -= self.damage
                 if(dist > 0):
                     g = (self.position - other.position) / dist # unit vector points away from other
                     g *= self.personal_space / dist # increases the more personal space is violated
                 f += g
-                if not self.isFacing(other):
+                if not self.isFacing(other) or self.has_gun:
                     f *= 0.5 # halve influence TODO extract constant
+
             if other.isWall():
                 g = Vector(0,0)
                 if other.insideBounds(self):
