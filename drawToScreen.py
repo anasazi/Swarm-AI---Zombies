@@ -1,3 +1,4 @@
+from agent import isGunCache
 import pygame, sys, time
 from pygame.locals import *
 from random import randint, choice, random
@@ -47,6 +48,7 @@ BLACK = (0, 0, 0)
 RED = (210, 10, 10)
 GREEN = (15, 155, 15)
 GRAY = (100, 100, 100)
+BLUE = (0, 128, 255)
 
 # set up the block data structure
 agents = []
@@ -92,6 +94,12 @@ for w in range(50):
     wall = WallAgent(l, r, n)
     agents.append(wall)
 
+for c in range(10):
+    pos = Vector(random()*750+25,random()*750+25)
+    guns = random()*15
+    cache = GunCacheAgent(pos, guns)
+    agents.append(cache)
+
 # run the game loop
 t = 0
 while t < tMAX:
@@ -120,8 +128,10 @@ while t < tMAX:
             b['color'] = (15, round((100-agents[i].health)/100 * 155), 15)
         if(agents[i].isWall()):
             pygame.draw.line(windowSurface, (220, 220, 220), agents[i].left_point.vec2tuple(), agents[i].right_point.vec2tuple(), 2)
-            
-        
+        if(agents[i].isGunCache()):
+            pygame.draw.rect(windowSurface, BLUE, (agents[i].position.x-5-guns, agents[i].position.y-5-guns, agents[i].position.x+5+guns, agents[i].position.y+5+guns), 0)
+
+
     agentLimit = len(agentDots)
     i = 0
     while i < agentLimit:    

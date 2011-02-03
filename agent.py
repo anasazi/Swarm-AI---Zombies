@@ -101,6 +101,18 @@ class HumanAgent(Agent):
                     temp = temp/temp.magnitude()
                     g += temp * (-30 / dst / dst) 
                 f += g
+            if other.isGunCache():
+                g = Vector(0,0)
+                dist = (self.position - other.position).magnitude()
+                if not self.has_gun and other.guns > 0: #attracted to the caches if unarmed and the cache is not empty
+                    if other.insideBounds(self):
+                        self.has_gun = True
+                        other.guns = other.guns-1
+                    else:
+                        g = (other.position - self.position) / dist
+                    g *= self.personal_space / dist #increases the closer they are to the cache
+
+
         return f
 
 class ZombieAgent(Agent):
@@ -201,7 +213,16 @@ class WallAgent(Agent):
 #return Closest;
 
 class GunCacheAgent(Agent):
-    def __init__(self, position):
-        Agent.__init__(self, position, Vector(0,0), 0.0, 0.0, 0.0, 0.0)
+    def __init__(self, position, guns):
+        Agent.__init__(self, 1, position, Vector(0,0), 0.0, 0.0, 0.0, 0.0)
+        self.position = position
+        #10x10 box when empty; increases in size proportional to the number of guns inside
+        self.left_point = Vector(position.x-5-guns, position.y-5-guns)
+        self.right_point = Vector(position.x+5+guns, left_point.y+5+guns)
+        self.guns = guns
     def isGunCache(self):
         return True
+    def insideBounds(self, other):
+        inx = self.left_point.x < other.position.x < self.right_point.x or self.left_point.x > other.position.x > self.right_point.x
+        iny = self.left_point.y < other.position.y < self.right_point.y or self.left_point.y > other.position.y > self.right_point.y
+        return inx or iny
