@@ -1,4 +1,3 @@
-from agent import isGunCache
 import pygame, sys, time
 from pygame.locals import *
 from random import randint, choice, random
@@ -57,7 +56,7 @@ tMAX = 2000
 t1 = time.time()
 
 
-for i in range(170):
+for i in range(230):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -71,7 +70,7 @@ for i in range(170):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(25):
+for i in range(40):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
@@ -85,8 +84,35 @@ for i in range(25):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GREEN}
     agentDots.append(tempBall)
 
+#draw outer edges
+l = Vector(0,0)
+r = Vector(800,0)
+n = (r - l).normal()
+n = n / n.magnitude()
+wall = WallAgent(l, r, n)
+agents.append(wall)
+l = Vector(800,0)
+r = Vector(799,799)
+n = (r - l).normal()
+n = n / n.magnitude()
+wall = WallAgent(l, r, n)
+agents.append(wall)
+l = Vector(0,800)
+r = Vector(800,800)
+n = (r - l).normal()
+n = n / n.magnitude()
+wall = WallAgent(l, r, n)
+agents.append(wall)
+l = Vector(0,0)
+r = Vector(0,800)
+n = (r - l).normal()
+n = n / n.magnitude()
+wall = WallAgent(l, r, n)
+agents.append(wall)
 
-for w in range(50):    
+
+
+for w in range(30):    
     l = Vector(random()*750+25,random()*750+25)
     r = Vector(l.x-random()*40,l.y-random()*40)
     n = (r - l).normal()
@@ -94,7 +120,7 @@ for w in range(50):
     wall = WallAgent(l, r, n)
     agents.append(wall)
 
-for c in range(10):
+for c in range(2):
     pos = Vector(random()*750+25,random()*750+25)
     guns = random()*15
     cache = GunCacheAgent(pos, guns)
@@ -129,7 +155,7 @@ while t < tMAX:
         if(agents[i].isWall()):
             pygame.draw.line(windowSurface, (220, 220, 220), agents[i].left_point.vec2tuple(), agents[i].right_point.vec2tuple(), 2)
         if(agents[i].isGunCache()):
-            pygame.draw.rect(windowSurface, BLUE, (agents[i].position.x-5-guns, agents[i].position.y-5-guns, agents[i].position.x+5+guns, agents[i].position.y+5+guns), 0)
+            pygame.draw.rect(windowSurface, BLUE, (agents[i].left_point.x, agents[i].left_point.y, 5+agents[i].guns, 5+agents[i].guns ), 0)
 
 
     agentLimit = len(agentDots)

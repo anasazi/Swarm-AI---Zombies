@@ -207,28 +207,14 @@ class WallAgent(Agent):
                 t = 1;
         return self.left_point + dB * t
                 
-        
-#Vector GetClosetPoint(Vector A, Vector B, Vector P, bool segmentClamp){
-#Vector AP = P - A:
-#Vector AB = B - A;
-#float ab2 = AB.x*AB.x + AB.y*AB.y;
-#float ap_ab = AP.x*AB.x + AP.y*AB.y;
-#float t = ap_ab / ab2;
-#if (segmentClamp)
-#{
-# if (t < 0.0f) t = 0.0f;
-# else if (t > 1.0f) t = 1.0f;
-#}
-#Vector Closest = A + AB * t;
-#return Closest;
 
 class GunCacheAgent(Agent):
     def __init__(self, position, guns):
-        Agent.__init__(self, 1, position, Vector(0,0), 0.0, 0.0, 0.0, 0.0)
+        Agent.__init__(self, 1, position, Vector(1,1), 0.0, 0.0, 0.0, 0.0)
         self.position = position
         #10x10 box when empty; increases in size proportional to the number of guns inside
-        self.left_point = Vector(position.x-5-guns, position.y-5-guns)
-        self.right_point = Vector(position.x+5+guns, left_point.y+5+guns)
+        self.left_point = Vector(self.position.x-2-guns, self.position.y-2-guns)
+        self.right_point = Vector(self.position.x+2+guns, self.position.y+2+guns)
         self.guns = guns
     def isGunCache(self):
         return True
