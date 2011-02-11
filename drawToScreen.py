@@ -1,6 +1,6 @@
 import pygame, sys, time
 from pygame.locals import *
-from random import randint, choice, random
+from random import randint, choice, random, sample
 from vector import *
 #from movingAgent import *
 from agent import *
@@ -44,7 +44,7 @@ pygame.display.set_caption('Animation')
 PIover2 = pi/2
 # set up the colors
 BLACK = (0, 0, 0)
-RED = (210, 10, 10)
+RED = (170, 100, 100)
 GREEN = (15, 155, 15)
 GRAY = (100, 100, 100)
 BLUE = (0, 128, 255)
@@ -52,11 +52,14 @@ BLUE = (0, 128, 255)
 # set up the block data structure
 agents = []
 agentDots = []
-tMAX = 2000
+tMAX = 3000
 t1 = time.time()
 
 
-for i in range(230):
+    
+        
+
+for i in range(250):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -64,13 +67,13 @@ for i in range(230):
     max_speedi = 3
     orientationi = Vector(random()-.5,random()-.5)
     sightAngle = 120
-    sightRadius = 50
-    tempAgent = HumanAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, False, 35.0, 0, 10, 10)
+    sightRadius = 60
+    tempAgent = HumanAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, False, 35.0, 0, 5, 10)
     agents.append(tempAgent)
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(40):
+for i in range(35):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
@@ -83,6 +86,35 @@ for i in range(40):
     agents.append(tempAgent)
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GREEN}
     agentDots.append(tempBall)
+
+# initialize the building types
+def draw_wall(nums_list, x, y):
+    nums_list = nums_list[0]
+    for nums in nums_list:
+        l = Vector(nums[0]+x, nums[1]+y)
+        r = Vector(nums[2]+x, nums[3]+y)
+        n = (r - l).normal()
+        n = n / n.magnitude()
+        wall = WallAgent(l, r, n)
+        agents.append(wall)
+
+w1 = [(50, 50, 50,100), (50, 100, 100, 100), (50, 50, 100, 50), (100, 50, 100, 80)]
+w2 = [(50, 50, 50,100), (50, 100, 80, 100), (50, 50, 100, 50), (100, 50, 100, 100)]
+w3 = [(100, 0, 100, 100)]
+w4 = [(0, 100, 100, 100)]
+w5 = [(0, 0, 0, 100)]
+w6 = [(0, 0, 100, 0)]
+w7 = [(25, 25, 25, 40), (25, 40, 40, 40), (25, 25, 40, 25), (85, 65, 65, 85)]
+w8 = [(10, 10, 75, 10), (10, 10, 10, 45), (10, 45, 45, 45), (45, 45, 45, 65), (75, 10, 75, 65), (65, 65, 75, 65)]
+w9 = [(3, 3, 15, 3), (35, 3, 85, 3), (3, 3, 3, 25), (3, 25, 55, 25), (55, 25, 55, 85), (55, 85, 60, 95), (85, 3, 85, 95),(85, 95, 75, 95)]
+w10 = [(25, 10, 25, 45), (25, 45, 5, 45), (5, 45, 5, 75), (5, 75, 35, 75), (65, 75, 85, 75), (85, 75, 85, 45), (85, 45, 45, 45), (45, 45, 45, 10)] 
+building_list = [w1, w2, w3, w4, w5, w6, w7, w8, w9, w10]
+for x in range(25, 725, 100):
+    for y in range(25, 725, 100):
+        draw_wall(sample(building_list, 1), x, y)
+        
+    
+
 
 #draw outer edges
 l = Vector(0,0)
@@ -110,19 +142,9 @@ n = n / n.magnitude()
 wall = WallAgent(l, r, n)
 agents.append(wall)
 
-
-
-for w in range(30):    
-    l = Vector(random()*750+25,random()*750+25)
-    r = Vector(l.x-random()*40,l.y-random()*40)
-    n = (r - l).normal()
-    n = n / n.magnitude()
-    wall = WallAgent(l, r, n)
-    agents.append(wall)
-
-for c in range(2):
+for c in range(4):
     pos = Vector(random()*750+25,random()*750+25)
-    guns = random()*15
+    guns = random()*3
     cache = GunCacheAgent(pos, guns)
     agents.append(cache)
 
@@ -156,6 +178,12 @@ while t < tMAX:
             pygame.draw.line(windowSurface, (220, 220, 220), agents[i].left_point.vec2tuple(), agents[i].right_point.vec2tuple(), 2)
         if(agents[i].isGunCache()):
             pygame.draw.rect(windowSurface, BLUE, (agents[i].left_point.x, agents[i].left_point.y, 5+agents[i].guns, 5+agents[i].guns ), 0)
+        if(agents[i].isHuman() and agents[i].has_gun and not agents[i].incubating):
+            a = agentDots[i]
+            a['color'] = RED
+        if(agents[i].isHuman() and agents[i].has_gun and agents[i].firing):
+            pygame.draw.line(windowSurface, (240, 240, 240), agents[i].position.vec2tuple(), agents[i].firing_target.vec2tuple())
+            agents[i].firing = 0
 
 
     agentLimit = len(agentDots)

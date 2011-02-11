@@ -21,8 +21,8 @@ class Agent:
         else:
             return (self.position - other.position).magnitude() <= self.sight_range
     def isFacing(self, other):
-        '''Returns True if the other agent is inside the angle of sight of this agent'''
-        return abs(self.orientation.angleBetween(other.position)) <= self.sight_angle
+        '''Returns True if the other agent is inside the angle of sight of this agent'''        
+        return self.orientation.angleBetween(other.position)*180/pi <= self.sight_angle
     def isHuman(self):
         return False
     def isZombie(self):
@@ -61,6 +61,8 @@ class HumanAgent(Agent):
         self.health = 100;
         self.attack_range = attack_range
         self.damage = damage
+        self.firing = 0
+        self.firing_target = Vector(0,0)
     def isHuman(self):
         return True
     def getForce(self, other):
@@ -85,10 +87,13 @@ class HumanAgent(Agent):
                     f *= 0.5 # halve influence TODO extract constant      
             if other.isZombie():
                 dist = (self.position - other.position).magnitude()
-                if (dist <= self.sight_range and self.isFacing(other) and self.has_gun):
+                if (self.has_gun and not self.firing and dist <= self.sight_range and self.isFacing(other)):
                     accuracy = 6 + dist / (self.sight_range / 4) #adjusts bounds of damage sig function based on distance from target
                     rand = random()*16 - accuracy
                     gunDamage = (1 / (1 + exp(rand))) * 100
+                    #print('POW - ', gunDamage, ' Damage')
+                    self.firing = 1
+                    self.firing_target = other.position
                     other.health -= gunDamage
                 if(dist <= self.attack_range and self.isFacing(other)):
                     other.health -= self.damage
@@ -105,8 +110,10 @@ class HumanAgent(Agent):
                     dst = other.perpDist(self)
                     temp = other.closestPoint(self, 1)
                     temp = temp - self.position
-                    temp = temp/temp.magnitude()
-                    g += temp * (-30 / dst / dst) 
+                    if(temp.magnitude() != 0):
+                        temp = temp/temp.magnitude()
+                    if(dst != 0):
+                        g += temp * (-30 / dst / dst) 
                 f += g
             if other.isGunCache():
                 g = Vector(0,0)
@@ -167,8 +174,10 @@ class ZombieAgent(Agent):
                     dst = other.perpDist(self)
                     temp = other.closestPoint(self, 1)
                     temp = temp - self.position
-                    temp = temp/temp.magnitude()
-                    g += temp * (-30 / dst / dst)
+                    if(temp.magnitude() != 0):
+                        temp = temp/temp.magnitude()
+                    if(dst != 0):
+                        g += temp * (-30 / dst / dst)
                 f += g
         return f
 
