@@ -36,8 +36,32 @@ class Agent:
         return Vector(0,0)
     def getTotalForce(self, others):
         '''Computes the net force on this agent by all other agents'''
-        res = Vector(0,0)
+        res = Vector(0,0) 
+        wall_list = []
+        active_agents = others
         for o in others:
+            if o.isWall() and self.inRangeOf(o):
+                wall_list.append(o)
+                
+        for i in range(len(others)):
+            o = others[i]
+            if(self.inRangeOf(o)):
+                for w in wall_list:
+                    if o.isWall():
+                        break
+                    elif o.isHuman() or o.isZombie():
+                        a = w.closestPoint(self, 1) - self.position 
+                        b =  w.closestPoint(o, 1) - o.position
+                        c = a+b
+                        if c.magnitudeSansRoot() < a.magnitudeSansRoot(): #true if they arent on the same side
+                            if w.intersectsWall(self.position, o.position):
+                                active_agents = active_agents[:i] + active_agents[i+1:]
+                                i -= 1
+                                break
+                    elif o.isGunCache():
+                        break
+        #only get the forces for visible agents
+        for o in active_agents:
             res += self.getForce(o)
         return res
     def update(self, force):
@@ -215,7 +239,18 @@ class WallAgent(Agent):
             elif (t > 1):
                 t = 1;
         return self.left_point + dB * t
-                
+    def intersectsWall(self, C,D):
+        A = self.left_point
+        B = self.right_point
+        E = B-A 
+        F = D-C 
+        P = E.normal()
+        if(F.dotProduct(P) == 0):
+            return 0
+        G = A - C
+        h = (G.dotProduct(P)) / (F.dotProduct(P))
+        return h
+
 
 class GunCacheAgent(Agent):
     def __init__(self, position, guns):

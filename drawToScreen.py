@@ -59,7 +59,7 @@ t1 = time.time()
     
         
 
-for i in range(250):
+for i in range(140):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -67,13 +67,13 @@ for i in range(250):
     max_speedi = 3
     orientationi = Vector(random()-.5,random()-.5)
     sightAngle = 120
-    sightRadius = 60
+    sightRadius = 100
     tempAgent = HumanAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, False, 35.0, 0, 5, 10)
     agents.append(tempAgent)
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(35):
+for i in range(20):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
