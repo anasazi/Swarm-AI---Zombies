@@ -137,8 +137,7 @@ class HumanAgent(Agent):
                     if(temp.magnitude() != 0):
                         temp = temp/temp.magnitude()
                     if(dst != 0):
-                        g += temp * exp(1 / dst)
-                        #g += temp * (-30 / dst / dst) 
+                        g += temp * (-30 / dst / dst) 
                 f += g
             if other.isGunCache():
                 g = Vector(0,0)
@@ -202,8 +201,7 @@ class ZombieAgent(Agent):
                     if(temp.magnitude() != 0):
                         temp = temp/temp.magnitude()
                     if(dst != 0):
-                        g += temp * exp(1 / dst)
-                        #g += temp * (-30 / dst / dst)
+                        g += temp * (-30 / dst / dst)
                 f += g
         return f
 
