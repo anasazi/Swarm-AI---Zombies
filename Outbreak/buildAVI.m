@@ -1,7 +1,7 @@
 % Robert Pienta
 clear all
 clc
-aviobj = avifile('outBreak8.avi','compression','Cinepak', 'fps', 32);
+aviobj = avifile('outBreak12.avi','compression','Cinepak', 'fps', 24);
 extension = '*.png';
 files = dir(extension);
 for i=1:size(files, 1)
