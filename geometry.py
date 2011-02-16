@@ -104,51 +104,51 @@ def calculateIntersectPoint(p1, p2, p3, p4):
   
    p = getIntersectPoint(p1, p2, p3, p4)
   
-   if p is not None:               
-       width = p2[0] - p1[0]
-       height = p2[1] - p1[1]       
-       r1 = Rect(p1, (width , height))
-       r1.normalize()
+   if p is not None:
+      width = p2[0] - p1[0]
+      height = p2[1] - p1[1]       
+      r1 = Rect(p1, (width , height))
+      r1.normalize()
       
-       width = p4[0] - p3[0]
-       height = p4[1] - p3[1]
-       r2 = Rect(p3, (width, height))
-       r2.normalize()              
+      width = p4[0] - p3[0]
+      height = p4[1] - p3[1]
+      r2 = Rect(p3, (width, height))
+      r2.normalize()              
  
-       # Ensure both rects have a width and height of at least 'tolerance' else the
-       # collidepoint check of the Rect class will fail as it doesn't include the bottom
-       # and right hand side 'pixels' of the rectangle
-       tolerance = 1
-        if r1.width &lt; tolerance:
-            r1.width = tolerance
+      # Ensure both rects have a width and height of at least 'tolerance' else the
+      # collidepoint check of the Rect class will fail as it doesn't include the bottom
+      # and right hand side 'pixels' of the rectangle
+      tolerance = 1
+      if r1.width < tolerance:
+         r1.width = tolerance
                     
-        if r1.height &lt; tolerance:
-            r1.height = tolerance
+      if r1.height < tolerance:
+         r1.height = tolerance
         
-        if r2.width &lt; tolerance:
-            r2.width = tolerance
+      if r2.width < tolerance:
+         r2.width = tolerance
                     
-        if r2.height &lt; tolerance:
-            r2.height = tolerance
+      if r2.height < tolerance:
+         r2.height = tolerance
  
-        for point in p:                 
-            try:    
-                res1 = r1.collidepoint(point)
-                res2 = r2.collidepoint(point)
-                if res1 and res2:
-                    point = [int(pp) for pp in point]                                
-                    return point
-            except:
-                # sometimes the value in a point are too large for PyGame's Rect class
-                str = "point was invalid  ", point                
-                print str
+      for point in p:
+         try:
+            res1 = r1.collidepoint(point)
+            res2 = r2.collidepoint(point)
+            if res1 and res2:
+               point = [int(pp) for pp in point]                                
+               return point
+         except:
+            # sometimes the value in a point are too large for PyGame's Rect class
+            str = "point was invalid  ", point                
+            print(str)
                 
-        # This is the case where the infinately long lines crossed but 
-        # the line segments didn't
-        return None            
+      # This is the case where the infinately long lines crossed but 
+      # the line segments didn't
+      return None
     
-    else:
-        return None
+   else:
+      return None
         
         
 # Test script below...
@@ -185,4 +185,4 @@ if __name__ == "__main__":
     assert None != calculateIntersectPoint(p7, p8, p9, p10), "line 4 line 5 should intersect"
     assert None != calculateIntersectPoint(p9, p10, p7, p8), "line 5 line 4 should intersect"
     
-    print "\nSUCCESS! All asserts passed for doLinesIntersect"
+    print("\nSUCCESS! All asserts passed for doLinesIntersect")

@@ -1,6 +1,7 @@
 from vector import *
 from math import sqrt, pi, exp
 from random import random
+from geometry import calculateIntersectPoint
 
 class Agent:
     def __init__(self, mass, position, orientation, speed, sight_range, sight_angle, max_speed):
@@ -36,36 +37,29 @@ class Agent:
         return Vector(0,0)
     def getTotalForce(self, others):
         '''Computes the net force on this agent by all other agents'''
-        res = Vector(0,0) 
-        wall_list = []
-        active_agents = others
+        res = Vector(0,0)
+        walls = [ o for o in others if o.isWall() and self.inRangeOf(o) ]
         for o in others:
-            if o.isWall() and self.inRangeOf(o):
-                wall_list.append(o)
-                
-        for i in range(len(others)):
-            o = others[i]
-            if(self.inRangeOf(o)):
-                for w in wall_list:
-                    if o.isWall():
+            if self.inRangeOf(o):
+                los = True
+                for w in walls:
+                    if not o.isWall() and w.intersectsWall(self, o):
+                        los = False
                         break
-                    elif o.isHuman() or o.isZombie():
-                        a = w.closestPoint(self, 1) - self.position 
-                        b =  w.closestPoint(o, 1) - o.position
-                        c = a+b
-                        if c.magnitudeSansRoot() < a.magnitudeSansRoot(): #true if they arent on the same side
-                            if w.intersectsWall(self.position, o.position):
-                                active_agents = active_agents[:i] + active_agents[i+1:]
-                                i -= 1
-                                break
-                    elif o.isGunCache():
-                        break
-        #only get the forces for visible agents
-        for o in active_agents:
-            res += self.getForce(o)
+##                    if o.isWall():
+##                        if w != o and w.intersectsWall(self, o):
+##                            los = False
+##                            break
+##                    else:
+##                        if w.intersectsWall(self, o):
+##                            los = False
+##                            break
+                if los:
+                    res += self.getForce(o)
         return res
+        
     def update(self, force):
-        '''Updates the position, orientation, and speed of this agent based on a force'''        
+        '''Updates the position, orientation, and speed of this agent based on a force'''
         if(self.isHuman() and self.incubating):
             self.health -= .1
         if force.magnitude() != 0.0:    
@@ -132,12 +126,14 @@ class HumanAgent(Agent):
                 g = Vector(0,0)
                 if other.insideBounds(self):
                     dst = other.perpDist(self)
-                    temp = other.closestPoint(self, 1)
+                    temp = other.closestPoint(self, True)
                     temp = temp - self.position
-                    if(temp.magnitude() != 0):
-                        temp = temp/temp.magnitude()
+                    #if(temp.magnitude() != 0):
+                     #   temp = temp/temp.magnitude()
                     if(dst != 0):
-                        g += temp * (-30 / dst / dst) 
+                        g += (temp / dst) * exp(1 / dst) * -1
+                        #g += (temp / (dst ** 3)) * -1
+                        #g += temp * (-30 / dst / dst) 
                 f += g
             if other.isGunCache():
                 g = Vector(0,0)
@@ -196,21 +192,27 @@ class ZombieAgent(Agent):
                 g = Vector(0,0)
                 if other.insideBounds(self):
                     dst = other.perpDist(self)
-                    temp = other.closestPoint(self, 1)
+                    temp = other.closestPoint(self, True)
                     temp = temp - self.position
-                    if(temp.magnitude() != 0):
-                        temp = temp/temp.magnitude()
+##                    if(temp.magnitude() != 0):
+##                        temp = temp/temp.magnitude()
                     if(dst != 0):
-                        g += temp * (-30 / dst / dst)
+                        g += (temp / dst) * exp(1 / dst) * -1
+                        #g += (temp / (dst ** 3)) * -1
+##                        g += temp * (-30 / dst / dst)
                 f += g
         return f
 
 class WallAgent(Agent):
     def __init__(self, left_point, right_point, normal):
-        Agent.__init__(self, 1, left_point, normal / normal.magnitude(), 0, 0.0, 0.0, 0)
+        Agent.__init__(self, 1, left_point + right_point / 2, normal / normal.magnitude(), 0, 0.0, 0.0, 0)
         self.left_point = left_point
         self.right_point = right_point
         self.normal = normal / normal.magnitude()
+    def __eq__(self, other):
+        return other.isWall() and \
+               self.left_point == other.left_point and \
+               self.right_point == other.right_point
     def isWall(self):
         return True
     def onNormalSide(self, other): 
@@ -240,17 +242,16 @@ class WallAgent(Agent):
                 t = 1;
         return self.left_point + dB * t
     def intersectsWall(self, C,D):
-        A = self.left_point
-        B = self.right_point
-        E = B-A 
-        F = D-C 
-        P = E.normal()
-        if(F.dotProduct(P) == 0):
-            return 0
-        G = A - C
-        h = (G.dotProduct(P)) / (F.dotProduct(P))
-        return h
-
+        
+        p1 = self.left_point.vec2tuple()
+        p2 = self.right_point.vec2tuple()
+        p3 = C.position.vec2tuple()
+        p4 = D.position.vec2tuple()
+        x = calculateIntersectPoint(p1,p2,p3,p4)
+        if not x:
+            return False
+        else:
+            return True
 
 class GunCacheAgent(Agent):
     def __init__(self, position, guns):

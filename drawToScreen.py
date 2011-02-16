@@ -31,7 +31,7 @@ class UpdateThread(threading.Thread):
 pygame.init()
 
 #are we rendering to a file?
-RENDERTOFILE = 1
+RENDERTOFILE = 0
 FILENAME = 'Outbreak\\'
 
 # set up the window
@@ -56,15 +56,20 @@ tMAX = 3000
 t1 = time.time()
 
 
-    
-        
+##x = HumanAgent(5, Vector(170,150), Vector(1,1), 0.5, 20, 180, 1, False, 35.0, 0, 5, 10)
+##agents += [x]
+##agentDots += [{'x':180,'y':150,'rad':3,'color':GRAY}]
+##
+##x = ZombieAgent(5, Vector(220,190), Vector(1,0), 1, 20, 180, 1, 25, 5, 10)
+##agents += [x]
+##agentDots += [{'x':190,'y':150,'rad':3,'color':GREEN}]
 
-for i in range(140):
+for i in range(10):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
     max_forcei = 1
-    max_speedi = 3
+    max_speedi = 1
     orientationi = Vector(random()-.5,random()-.5)
     sightAngle = 120
     sightRadius = 100
@@ -73,12 +78,12 @@ for i in range(140):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(20):
+for i in range(5):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
     max_forcei = 1
-    max_speedi = 2
+    max_speedi = 1
     orientationi = Vector(random()-.5,random()-.5)
     sightAngle = 160
     sightRadius = 120
@@ -97,6 +102,11 @@ def draw_wall(nums_list, x, y):
         n = n / n.magnitude()
         wall = WallAgent(l, r, n)
         agents.append(wall)
+
+##agents += [WallAgent(Vector(160,140), Vector(160,180), Vector(1,0))]
+##agents += [WallAgent(Vector(230,140), Vector(230,200), Vector(-1,0))]
+##agents += [WallAgent(Vector(160,140), Vector(230,140), Vector(0,1))]
+##agents += [WallAgent(Vector(160,200), Vector(230,200), Vector(0,-1))]
 
 w1 = [(50, 50, 50,100), (50, 100, 100, 100), (50, 50, 100, 50), (100, 50, 100, 80)]
 w2 = [(50, 50, 50,100), (50, 100, 80, 100), (50, 50, 100, 50), (100, 50, 100, 100)]
