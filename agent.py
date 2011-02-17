@@ -145,7 +145,7 @@ class HumanAgent(Agent):
                         other.guns = other.guns-1
                     else:
                         g = (other.position - self.position) / dist
-                    g *= self.personal_space / dist #increases the closer they are to the cache
+                    g *= 150 / dist #increases the closer they are to the cache
                 f+=g
                 if not self.isFacing(other):
                     f *= 0.5 # halve influence TODO extract constant
@@ -173,7 +173,7 @@ class ZombieAgent(Agent):
                 #seek human agents, I AM HUNGRY FOR BRAINS
                 if(dist > 0):
                     g = (other.position - self.position) / dist # unit vector points towards self
-                g *= dist / 10 # increases the farther they are from me
+                g *= 150 / dist  # increases the farther they are from me
                 f += g
                 # handle alignment with superposition
                 f += (other.velocity() - self.velocity()) * 0.1 # TODO extract constant
@@ -268,4 +268,4 @@ class GunCacheAgent(Agent):
     def insideBounds(self, other):
         inx = self.left_point.x < other.position.x < self.right_point.x or self.left_point.x > other.position.x > self.right_point.x
         iny = self.left_point.y < other.position.y < self.right_point.y or self.left_point.y > other.position.y > self.right_point.y
-        return inx or iny
+        return inx and iny

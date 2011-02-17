@@ -64,16 +64,16 @@ t1 = time.time()
 ##agents += [x]
 ##agentDots += [{'x':190,'y':150,'rad':3,'color':GREEN}]
 
-for i in range(150):
+for i in range(250):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
     max_forcei = 1
     max_speedi = 0.9
     orientationi = Vector(random()-.5,random()-.5)
-    sightAngle = 120
+    sightAngle = 80
     sightRadius = 120
-    tempAgent = HumanAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, False, 35.0, 0, 10, 10)
+    tempAgent = HumanAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, False, 35.0, 0, 5, 10)
     agents.append(tempAgent)
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
@@ -83,11 +83,11 @@ for i in range(25):
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
     max_forcei = 1
-    max_speedi = 1.1
+    max_speedi = 1.6
     orientationi = Vector(random()-.5,random()-.5)
-    sightAngle = 120
+    sightAngle = 90
     sightRadius = 120
-    tempAgent = ZombieAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, 25, 10, 10)
+    tempAgent = ZombieAgent(massi, positioni, orientationi, speedi, sightRadius, sightAngle, max_speedi, 25, 12, 10)
     agents.append(tempAgent)
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GREEN}
     agentDots.append(tempBall)
