@@ -131,7 +131,8 @@ class HumanAgent(Agent):
                     #if(temp.magnitude() != 0):
                      #   temp = temp/temp.magnitude()
                     if(dst != 0):
-                        g += (temp / dst) * exp(1 / dst) * -1
+                        x = max(dst, 0.01)
+                        g += (temp / dst) * exp(1 / x) * -1
                         #g += (temp / (dst ** 3)) * -1
                         #g += temp * (-30 / dst / dst) 
                 f += g
@@ -197,7 +198,8 @@ class ZombieAgent(Agent):
 ##                    if(temp.magnitude() != 0):
 ##                        temp = temp/temp.magnitude()
                     if(dst != 0):
-                        g += (temp / dst) * exp(1 / dst) * -1
+                        x = max(dst, 0.01)
+                        g += (temp / dst) * exp(1 / x) * -1
                         #g += (temp / (dst ** 3)) * -1
 ##                        g += temp * (-30 / dst / dst)
                 f += g

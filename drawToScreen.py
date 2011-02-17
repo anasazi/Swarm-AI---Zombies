@@ -31,7 +31,7 @@ class UpdateThread(threading.Thread):
 pygame.init()
 
 #are we rendering to a file?
-RENDERTOFILE = 0
+RENDERTOFILE = 1
 FILENAME = 'Outbreak\\'
 
 # set up the window
@@ -64,7 +64,7 @@ t1 = time.time()
 ##agents += [x]
 ##agentDots += [{'x':190,'y':150,'rad':3,'color':GREEN}]
 
-for i in range(10):
+for i in range(140):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = 2
@@ -78,12 +78,12 @@ for i in range(10):
     tempBall = {'x':positioni.x,'y':positioni.y,'rad':3, 'color':GRAY}
     agentDots.append(tempBall)
 
-for i in range(5):
+for i in range(30):
     massi = 5
     positioni = Vector(randint(10, 790), randint(10, 790))
     speedi = .5
     max_forcei = 1
-    max_speedi = 1
+    max_speedi = .85
     orientationi = Vector(random()-.5,random()-.5)
     sightAngle = 160
     sightRadius = 120
